@@ -5,6 +5,7 @@ from typing import List, Set, Dict
 import ast
 import itertools
 import json
+import base64
 
 
 class SimpleModel:
@@ -822,10 +823,27 @@ class SimpleModel:
         return True
 
     @staticmethod
-    def parse_mapping(file_name: str) -> (Dict[int, List[int]], List[int]):
+    def parse_mapping_file(file_name: str) -> (Dict[int, List[int]], List[int]):
         input_file = open(file_name, "r")
         lines = input_file.readlines()
         input_file.close()
+        return SimpleModel.parse_mapping(lines)
+    
+    @staticmethod
+    def parse_mapping_base64(base64String: str) -> (Dict[int, List[int]], List[int]):
+        string = base64.b64decode(base64String).decode("UTF-8")
+        return SimpleModel.parse_mapping_string(string)
+    
+    @staticmethod
+    def parse_mapping_string(string: str) -> (Dict[int, List[int]], List[int]):
+        lines = string.splitlines()
+        for i in range(0, len(lines)):
+            if not lines[i].endswith("\n"):
+                lines[i] += "\n"
+        return SimpleModel.parse_mapping_lines(lines)
+
+    @staticmethod
+    def parse_mapping_lines(lines: List[str]) -> (Dict[int, List[int]], List[int]):
         result = dict()
         coalition = []
 
@@ -842,10 +860,27 @@ class SimpleModel:
         return result, coalition
 
     @staticmethod
-    def parse_mapping_sets(file_name: str) -> (List[List[List[int]]], List[int]):
+    def parse_mapping_sets_file(file_name: str) -> (List[List[List[int]]], List[int]):
         input_file = open(file_name, "r")
         lines = input_file.readlines()
         input_file.close()
+        return SimpleModel.parse_mapping_sets(lines)
+    
+    @staticmethod
+    def parse_mapping_sets_base64(base64String: str) -> (List[List[List[int]]], List[int]):
+        string = base64.b64decode(base64String).decode("UTF-8")
+        return SimpleModel.parse_mapping_sets_string(string)
+    
+    @staticmethod
+    def parse_mapping_sets_string(string: str) -> (List[List[List[int]]], List[int]):
+        lines = string.splitlines()
+        for i in range(0, len(lines)):
+            if not lines[i].endswith("\n"):
+                lines[i] += "\n"
+        return SimpleModel.parse_mapping_sets_lines(lines)
+
+    @staticmethod
+    def parse_mapping_sets_lines(lines: List[str]) -> (List[List[List[int]]], List[int]):
         result = []
         coalition = []
 

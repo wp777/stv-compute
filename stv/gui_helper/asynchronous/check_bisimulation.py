@@ -17,9 +17,9 @@ global_model2.generate_local_models()
 
 winning = []
 
-mapping, coalition = SimpleModel.parse_mapping_sets(relationPath)
+mapping, coalition = SimpleModel.parse_mapping_sets_base64(relationPath)
 
-mapping2, coalition2 = SimpleModel.parse_mapping(relationPath)
+mapping2, coalition2 = SimpleModel.parse_mapping_base64(relationPath)
 
 bis_result = global_model1.model.check_bisimulation(global_model2.model, mapping2, coalition2)
 
