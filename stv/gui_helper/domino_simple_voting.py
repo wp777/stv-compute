@@ -10,8 +10,6 @@ heuristic = int(sys.argv[5])
 simple_voting = SimpleVotingModel(no_candidates, no_voters)
 simple_voting.generate()
 
-print(simple_voting.model.js_dump_model())
-
 winning = []
 
 state_id = -1

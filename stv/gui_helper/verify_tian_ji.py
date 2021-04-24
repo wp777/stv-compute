@@ -7,7 +7,6 @@ v = int(sys.argv[4])
 
 tian_ji_model = TianJiModel(horses)
 tian_ji_model.generate()
-print(tian_ji_model.model.js_dump_model())
 
 if v == 1:
     atl_model = tian_ji_model.model.to_atl_imperfect(tian_ji_model.get_actions())

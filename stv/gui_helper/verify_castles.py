@@ -11,8 +11,6 @@ v = int(sys.argv[7])
 castle_model = CastleModel([castle1_size, castle2_size, castle3_size], [life, life, life])
 castle_model.generate()
 
-print(castle_model.model.js_dump_model())
-
 if v == 1:
     atl_model = castle_model.model.to_atl_imperfect(castle_model.get_actions())
 else:

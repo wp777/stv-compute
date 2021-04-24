@@ -8,7 +8,6 @@ v = int(sys.argv[5])
 
 simple_voting = SimpleVotingModel(no_candidates, no_voters)
 simple_voting.generate()
-print(simple_voting.model.js_dump_model())
 
 if v == 1:
     atl_model = simple_voting.model.to_atl_imperfect(simple_voting.get_actions())
