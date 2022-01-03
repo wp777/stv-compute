@@ -21,6 +21,7 @@ class LocalTransitionParser:
         state_from: str = ""
         state_to: str = ""
         cond = []
+        cond_str = ""
         props = {}
 
         if transition_str[0:6] == "shared":
@@ -28,20 +29,30 @@ class LocalTransitionParser:
             transition_str = transition_str[7:]
 
         action, transition_str = transition_str.split(":")
+
+        # parsing the pre-condition
         if transition_str.find("->") == -1:
             state_from, transition_str = transition_str.split("-[")
             conditions, transition_str = transition_str.split("]>")
-            if conditions.find("==") != -1:
-                cond_var, cond_val = conditions.split("==")
-                cond.append((cond_var, int(cond_val), "=="))
-            elif conditions.find("!=") != -1:
-                cond_var, cond_val = conditions.split("!=")
-                cond.append((cond_var, int(cond_val), "!="))
-            else:
-                raise Exception
+            cond_str = conditions
+            conditions = conditions.split('and')  # assume that conditions list represents their conjunction
+            for condition in conditions:
+                recognized_op = False
+                for op in ["==", "!=", ">=", "<=", ">", "<"]:
+                    if condition.find(op) != -1:
+                        term1, term2 = condition.split(op)
+                        # casting to int - in local_transition class
+                        cond.append((term1, term2, op))
+                        recognized_op = True
+                        break
+
+                if not recognized_op:
+                    print(f"ERR: Unknown binary operator in '{condition}'")
+                    raise Exception
         else:
             state_from, transition_str = transition_str.split("->")
 
+        # parsing the post-condition
         if transition_str.find("[") != -1:
             state_to, transition_str = transition_str.split("[")
             transition_str = transition_str.split("]")[0]
@@ -53,16 +64,26 @@ class LocalTransitionParser:
                     val = True
                 elif val.casefold() == "false":
                     val = False
+                elif val[0] == "?":
+                    pass
                 else:
                     try:
                         val = int(val)
                     except ValueError:
+                        print(f"ERR: Attempt to assign a non-integer value to a variable in '{prop}={val}'")
                         pass
-                props[prop] = val
+                if prop[-1] == "+":
+                    prop = prop.rstrip("+")
+                    props[prop] = ("+", val)
+                elif prop[-1] == "-":
+                    prop = prop.rstrip("-")
+                    props[prop] = ("-", val)
+                else:
+                    props[prop] = ("", val)
         else:
             state_to = transition_str
 
         state_from = state_from.strip()
         state_to = state_to.strip()
 
-        return LocalTransition(state_from, state_to, action, shared, cond, props)
+        return LocalTransition(state_from, state_to, action, shared, cond, props, cond_str)

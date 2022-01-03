@@ -12,8 +12,8 @@ class GlobalState:
         self._props: Dict = props.copy()
 
     @classmethod
-    def initial_state(cls, agent_count: int):
-        return cls([0 for _ in range(agent_count)], {}, 0)
+    def initial_state(cls, agent_count: int, props: Dict):
+        return cls([0 for _ in range(agent_count)], props, 0)
 
     @classmethod
     def copy_state(cls, state, persistent: List[str]):
@@ -39,11 +39,18 @@ class GlobalState:
     def id(self, value: int):
         self._id = value
 
+    def add_local_state_props(self, local_models):
+        for agent_num in range(len(local_models)):
+            self._props[f"{local_models[agent_num].agent_name}.{local_models[agent_num].get_state_name(self._local_states[agent_num])}"] = True
+
     def set_local_state(self, index: int, value: int):
         self._local_states[index] = value
 
     def set_prop(self, key: str, value):
         self._props[key] = value
+
+    def change_prop(self, key: str, value: int):
+        self._props[key] += value
 
     def remove_prop(self, key: str):
         if key in self._props:

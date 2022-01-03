@@ -18,7 +18,7 @@ class LocalTransition:
     :ivar j:
     """
 
-    def __init__(self, state_from: str, state_to: str, action: str, shared: bool, cond: List, props: dict):
+    def __init__(self, state_from: str, state_to: str, action: str, shared: bool, cond: List, props: dict, cond_str: str):
         self._id: int = -1
         self._agent_id = -1
         self._action: str = action
@@ -27,6 +27,7 @@ class LocalTransition:
         self._state_to: str = state_to
         self._props: dict = props
         self._conditions: List = cond
+        self._conditions_str: str = cond_str
         self.i: int = -1
         self.j: int = -1
         self._prot_name: str = action
@@ -101,12 +102,10 @@ class LocalTransition:
         :param state: Global state.
         :return: True if conditions are met, False otherwise.
         """
-        for cond in self.conditions:
-            if (cond[2] == "==" and ((cond[0] not in state.props) or (state.props[cond[0]] != cond[1]))) or (
-                    cond[2] == "!=" and cond[0] in state.props and state.props[cond[0]] == cond[1]):
-                return False
-
-        return True
+        if self._conditions_str == "":
+            return True
+        # print(self._conditions_str, state.props, eval(self._conditions_str, {}, state.props))
+        return eval(self._conditions_str, {}, state.props)
 
     def print(self):
         """Print transition in readable form."""
@@ -116,6 +115,9 @@ class LocalTransition:
         """Converts transition to tuple."""
         return self._agent_id, self.i, self.j
 
+    def __str__(self):
+        return f"{self._action}: {self._state_from} -> {self._state_to} [{self._props}]; conditions: {self._conditions}"
+
 
 class SharedTransition(LocalTransition):
     """
@@ -124,7 +126,7 @@ class SharedTransition(LocalTransition):
 
     def __init__(self, local_transition: LocalTransition):
         super().__init__(local_transition.state_from, local_transition.state_to, local_transition.action,
-                         True, local_transition.conditions, local_transition.props)
+                         True, local_transition.conditions, local_transition.props, local_transition._conditions_str)
         self._id: int = local_transition.id
         self._agent_id: int = local_transition.agent_id
         self._transition_list: List[local_transition] = [local_transition]

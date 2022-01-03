@@ -20,7 +20,7 @@ class LocalModelParser:
         :return: None.
         """
         lines: List[str] = model_str.splitlines()
-        agent_name: str = lines[0].split(" ")[1].split("[")[0] + str(agent_no)
+        agent_name: str = self._parse_agent_name(lines[0], str(agent_no))
         init_state: str = lines[1].split(" ")[1]
         states: Dict[str, int] = {init_state: 0}
         protocol: List[List[str]] = []
@@ -31,8 +31,13 @@ class LocalModelParser:
         for i in range(2, len(lines)):
             line = lines[i].strip()
             line = line.replace("aID", agent_name)
+            line = line.replace("ID", str(agent_no))
             if self._is_protocol_line(line):
                 protocol = self._parse_protocol(line)
+                continue
+            elif self._is_local_line(line):
+                continue
+            elif self._is_interface_line(line):
                 continue
 
             local_transition = LocalTransitionParser().parse(line)
@@ -41,6 +46,7 @@ class LocalModelParser:
             transition_id += 1
             if not local_transition.shared:
                 local_transition.action += f"_{agent_name}"
+                local_transition.prot_name = local_transition.action
 
             actions.add(local_transition.action)
             state_from = local_transition.state_from
@@ -60,12 +66,34 @@ class LocalModelParser:
 
         while len(transitions) < len(states):
             transitions.append([])
-
+        #
+        # for tran in transitions:
+        #     for tr in tran:
+        #         print(tr.prot_name)
         return LocalModel(agent_id, agent_name, states, transitions, protocol, actions)
+
+    @staticmethod
+    def _parse_agent_name(line: str, agent_no: str) -> str:
+        if line.find(" ") != -1:
+            line = line.split(" ")[1]
+        if line.find("[") != -1:
+            line = line.split("[")[0] + agent_no
+        if line.find(":") != -1:
+            line = line.split(":")[0]
+
+        return line
 
     @staticmethod
     def _is_protocol_line(line: str) -> bool:
         return line[:8] == "PROTOCOL"
+
+    @staticmethod
+    def _is_local_line(line: str) -> bool:
+        return line[:5] == "LOCAL"
+
+    @staticmethod
+    def _is_interface_line(line: str) -> bool:
+        return line[:9] == "INTERFACE"
 
     def _parse_protocol(self, line: str) -> (str, List[List[str]]):
         line = line.split(":")
