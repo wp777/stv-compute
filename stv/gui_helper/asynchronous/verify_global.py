@@ -14,7 +14,7 @@ if mode == "global":
     if v == 1:
         atl_model_global = global_model.model.to_atl_imperfect()
     else:
-        atl_model_global = global_model.model.to_atl_perfect(
+        atl_model_global = global_model.model.to_atl_perfect()
     
     winning = global_model.get_formula_winning_states()
     result = atl_model_global.minimum_formula_many_agents([global_model.get_agent()], winning)
