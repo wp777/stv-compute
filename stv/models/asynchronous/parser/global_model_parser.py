@@ -13,6 +13,104 @@ class GlobalModelParser:
     def __init__(self):
         pass
 
+    def parseFile(self, file_name: str) -> GlobalModel:
+        """
+        Parse model from the file.
+        :param file_name: Name of the file.
+        :return: GlobalModel.
+        """
+        input_file = open(file_name, "r")
+        lines = input_file.readlines()
+        input_file.close()
+        return self.parseLines(lines)
+
+    def parseBase64String(self, base64String: str) -> GlobalModel:
+        """
+        Parse model from the base64 string.
+        :param string: Base64 model string.
+        :return: GlobalModel.
+        """
+        string = base64.b64decode(base64String).decode("UTF-8")
+        return self.parseString(string)
+
+    def parseString(self, string: str) -> GlobalModel:
+        """
+        Parse model from the string.
+        :param string: Model string.
+        :return: GlobalModel.
+        """
+        lines = string.splitlines()
+        for i in range(0, len(lines)):
+            if not lines[i].endswith("\n"):
+                lines[i] += "\n"
+        return self.parseLines(lines)
+
+    def parseLines(self, lines: List[str]) -> GlobalModel:
+        """
+        Parse model from the lines.
+        :param lines: List of lines.
+        :return: GlobalModel.
+        """
+        local_models = []
+        reduction = []
+        bounded_vars = []
+        persistent = []
+        coalition = []
+        goal = []
+        logicType = LogicType.ATL
+        formula = ""
+        show_epistemic = True
+        semantics = "asynchronous"
+        i = 0
+        initial = {}
+        while i < len(lines):
+            if StringTools.is_blank_line(lines[i]) or self._is_comment_line(lines[i]):
+                i += 1
+                continue
+
+            if self._is_agent_header(lines[i]):
+                line_from = i
+                i = self._find_agent_end(lines, i + 1)
+                line_to = i
+                agent_max = self._parse_agent_max(lines[line_from])
+                for agent_id in range(1, agent_max + 1):
+                    local_model = LocalModelParser().parse(len(local_models), "".join(lines[line_from:line_to]),
+                                                           agent_id)
+                    local_models.append(local_model)
+            elif self._is_reduction_header(lines[i]):
+                reduction = self._parse_list(lines[i])
+                i += 1
+            elif self._is_bounded_vars_header(lines[i]):
+                bounded_vars = self._parse_list(lines[i])
+                i += 1
+            elif self._is_persistent_header(lines[i]):
+                persistent = self._parse_list(lines[i])
+                i += 1
+            elif self._is_coalition_header(lines[i]):
+                coalition = self._parse_list(lines[i])
+                i += 1
+            elif self._is_goal_header(lines[i]):
+                goal = self._parse_list(lines[i])
+                i += 1
+            elif self._is_logic_header(lines[i]):
+                logicType = self._parse_logic(lines[i])
+                i += 1
+            elif self._is_formula_header(lines[i]):
+                formula = self._parse_formula(lines[i])
+                i += 1
+            elif self._is_show_epistemic_header(lines[i]):
+                show_epistemic = self._parse_show_epistemic(lines[i])
+                i += 1
+            elif self._is_semantics_header(lines[i]):
+                semantics = self._parse_semantics(lines[i])
+                i += 1
+            elif self._is_initial_header(lines[i]):
+                initial = self._parse_initial(lines[i])
+                i += 1
+
+        return GlobalModel(local_models, reduction, bounded_vars, persistent, coalition, goal, logicType, formula, show_epistemic,
+                           semantics, initial)
+
     def parse(self, file_name: str) -> GlobalModel:
         """
         Parse model from the file.
@@ -35,7 +133,6 @@ class GlobalModelParser:
         i = 0
         initial = {}
         while i < len(lines):
-            # print(f"LOG: parsing line{i}")
             if StringTools.is_blank_line(lines[i]) or self._is_comment_line(lines[i]):
                 i += 1
                 continue
