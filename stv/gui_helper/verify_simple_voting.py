@@ -10,9 +10,9 @@ simple_voting = SimpleVotingModel(no_candidates, no_voters)
 simple_voting.generate()
 
 if v == 1:
-    atl_model = simple_voting.model.to_atl_imperfect(simple_voting.get_actions())
+    atl_model = simple_voting.model.to_atl_imperfect()
 else:
-    atl_model = simple_voting.model.to_atl_perfect(simple_voting.get_actions())
+    atl_model = simple_voting.model.to_atl_perfect()
 
 winning = set()
 

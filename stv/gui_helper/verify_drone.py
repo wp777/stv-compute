@@ -14,9 +14,9 @@ drone_model = DroneModel(n, energies, CracowMap())
 drone_model.generate()
 drone_model.listify_states()
 if v == 1:
-    atl_model = drone_model.model.to_atl_imperfect(drone_model.get_actions())
+    atl_model = drone_model.model.to_atl_imperfect()
 else:
-    atl_model = drone_model.model.to_atl_perfect(drone_model.get_actions())
+    atl_model = drone_model.model.to_atl_perfect()
 
 winning = set()
 

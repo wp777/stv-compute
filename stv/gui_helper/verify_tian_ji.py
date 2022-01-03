@@ -9,9 +9,9 @@ tian_ji_model = TianJiModel(horses)
 tian_ji_model.generate()
 
 if v == 1:
-    atl_model = tian_ji_model.model.to_atl_imperfect(tian_ji_model.get_actions())
+    atl_model = tian_ji_model.model.to_atl_imperfect()
 else:
-    atl_model = tian_ji_model.model.to_atl_perfect(tian_ji_model.get_actions())
+    atl_model = tian_ji_model.model.to_atl_perfect()
 
 winning = set()
 

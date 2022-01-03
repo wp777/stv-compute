@@ -20,9 +20,9 @@ bridge_model.generate()
 
 bridge_model.transitions_to_readable()
 if v == 1:
-    atl_model = bridge_model.model.to_atl_imperfect(bridge_model.get_actions())
+    atl_model = bridge_model.model.to_atl_imperfect()
 else:
-    atl_model = bridge_model.model.to_atl_perfect(bridge_model.get_actions())
+    atl_model = bridge_model.model.to_atl_perfect()
 
 winning = set()
 

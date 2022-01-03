@@ -12,9 +12,9 @@ castle_model = CastleModel([castle1_size, castle2_size, castle3_size], [life, li
 castle_model.generate()
 
 if v == 1:
-    atl_model = castle_model.model.to_atl_imperfect(castle_model.get_actions())
+    atl_model = castle_model.model.to_atl_imperfect()
 else:
-    atl_model = castle_model.model.to_atl_perfect(castle_model.get_actions())
+    atl_model = castle_model.model.to_atl_perfect()
 
 winning = set()
 
