@@ -3,6 +3,7 @@ from stv.tools import StringTools
 from stv.models.asynchronous import GlobalModel
 from stv.models.asynchronous.parser.local_model_parser import LocalModelParser
 from typing import List, Dict
+import base64
 
 
 class GlobalModelParser:
