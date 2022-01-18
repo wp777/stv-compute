@@ -97,12 +97,12 @@ class AssumptionParser:
                                       show_epistemic,
                                       semantics, initial, f"Assumption {groups[group_id]['name']}"))
 
-        result.append(GlobalModel(local_models, reduction, bounded_vars, persistent, coalition, goal, logicType,
+        global_model = GlobalModel(local_models, reduction, bounded_vars, persistent, coalition, goal, logicType,
                                       groups[0]['formula'],
                                       show_epistemic,
-                                      semantics, initial, 'Global'))
+                                      semantics, initial, 'Global')
 
-        return result
+        return result, global_model
 
     def parseString(self, string: str):
         lines = string.splitlines()
