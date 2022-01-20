@@ -1,9 +1,11 @@
+from ast import For
 import copy
 
 from stv.models.asynchronous.global_model import LogicType
 from stv.tools import StringTools
 from stv.models.asynchronous import GlobalModel
 from stv.models.asynchronous.parser.local_model_parser import LocalModelParser
+from stv.parsers.formula_parser import FormulaParser
 from typing import List, Dict
 import base64
 
@@ -76,6 +78,7 @@ class AssumptionParser:
                 i += 1
 
         result = []
+        formulas = []
         for group_id in range(len(groups)):
             if groups[group_id]['formula'] == "":
                 continue
@@ -92,17 +95,33 @@ class AssumptionParser:
 
                 new_local_models[local_id].remove_props(group_props)
 
+            formulas.append(groups[group_id]['formula'])
+
             result.append(GlobalModel(new_local_models, reduction, bounded_vars, persistent, coalition, goal, logicType,
                                       groups[group_id]['formula'],
                                       show_epistemic,
-                                      semantics, initial, f"Assumption {groups[group_id]['name']}"))
+                                      semantics, initial, f"Assumption Group {groups[group_id]['name']}"))
 
         global_model = GlobalModel(local_models, reduction, bounded_vars, persistent, coalition, goal, logicType,
-                                      groups[0]['formula'],
+                                      self._join_formulas(formulas),
                                       show_epistemic,
-                                      semantics, initial, 'Global')
+                                      semantics, initial, 'Global Model')
 
         return result, global_model
+
+    def _join_formulas(self, formulas: List[str]):
+        agents = []
+        expressions = []
+        operator = ""
+        parser = FormulaParser()
+        for formula in formulas:
+            atl_formula = parser.parseAtlFormula(formula)
+            agents += atl_formula.agents
+            expressions += [str(atl_formula.expression)]
+            if operator == "":
+                operator = str(atl_formula.temporalOperator.value)
+
+        return f"<<{','.join(agents)}>>{operator} {' & '.join(expressions)}"
 
     def parseString(self, string: str):
         lines = string.splitlines()

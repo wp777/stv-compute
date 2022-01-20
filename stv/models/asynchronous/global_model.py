@@ -809,7 +809,7 @@ class GlobalModel:
         # print(result)
         end = time.process_time()
 
-        return 0 in result, end - start
+        return 0 in result, end - start, result, atl_model.strategy
 
     def verify_domino(self):
         agent_id = self.get_agent()

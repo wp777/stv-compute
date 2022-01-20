@@ -57,3 +57,5 @@ if __name__ == "__main__":
     elif model == 'assumption':
         if method == 'run':
             import stv.gui_helper.asynchronous.run_assumption
+        elif method == "verify":
+            import stv.gui_helper.asynchronous.verify_assumption

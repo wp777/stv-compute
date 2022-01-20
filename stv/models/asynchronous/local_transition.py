@@ -22,6 +22,7 @@ class LocalTransition:
     def __init__(self, state_from: str, state_to: str, action: str, shared: bool, cond: List, props: dict, cond_str: str):
         self._id: int = -1
         self._agent_id = -1
+        self._clear_action: str = action
         self._action: str = action
         self._shared: bool = shared
         self._state_from: str = state_from
@@ -142,7 +143,7 @@ class LocalTransition:
         if not self._props:
             values = ""
 
-        return f"{self._action}: {self._state_from} -{conditions}> {self._state_to} {values}"
+        return f"{self._clear_action}: {self._state_from} -{conditions}> {self._state_to} {values}"
 
 
 class SharedTransition(LocalTransition):
