@@ -1,13 +1,10 @@
 import sys
-import json
-from stv.models.asynchronous.parser import GlobalModelParser
 from stv.models.asynchronous.parser import AssumptionParser
 
 modelName = sys.argv[3]
 modelStr = sys.argv[4]
 v = int(sys.argv[5])
 
-modelId = 0
 count = 0
 
 models, global_model = AssumptionParser().parseBase64String(modelStr)
@@ -25,14 +22,6 @@ for model in models:
 
 global_model.generate()
 formulas.append(global_model.formula)
-
-# print(json.dumps({
-#     "specs": [f"{model}" for model in models],
-#     "localModels": [model.model.js_dump_model(model.get_formula_winning_states(), model._show_epistemic) for model in models],
-#     "localModelNames": [model.name for model in models],
-#     "globalModel": global_model.model.js_dump_model(global_model.get_formula_winning_states(), global_model._show_epistemic),
-#     "formulas": formulas
-# }))
 
 verifModel = None
 

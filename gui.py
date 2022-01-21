@@ -48,14 +48,12 @@ if __name__ == "__main__":
     elif model == 'bisimulation':
         if method == 'run':
             import stv.gui_helper.asynchronous.run_bisimulation
-        elif method == 'verify':
-            import stv.gui_helper.asynchronous.verify_bisimulation
-        elif method == 'domino':
-            import stv.gui_helper.asynchronous.domino_bisimulation
         elif method == "check":
             import stv.gui_helper.asynchronous.check_bisimulation
     elif model == 'assumption':
         if method == 'run':
             import stv.gui_helper.asynchronous.run_assumption
-        elif method == "verify":
+        elif method == 'verify':
             import stv.gui_helper.asynchronous.verify_assumption
+        elif method == 'domino':
+            import stv.gui_helper.asynchronous.domino_assumption

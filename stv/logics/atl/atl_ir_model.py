@@ -328,7 +328,7 @@ class ATLIrModel:
         is_winning_state = self.marked_winning_states(winning_states)
         self.strategy = [None for _ in range(self.number_of_states)]
         while True:
-            current_states = self.basic_formula_many_agents(agent_ids, current_states, is_winning_state)
+            current_states = self.basic_max_formula_many_agents(agent_ids, current_states, is_winning_state)
             to_remove = result_states.difference(current_states)
             # print(result_states, current_states, to_remove)
             for state_id in to_remove:
@@ -341,20 +341,34 @@ class ATLIrModel:
 
         return result_states
 
+    def basic_max_formula_many_agents(self, agent_ids: List[int], current_states: Set[int],
+                                  is_winning_state: List[bool]) -> Set[int]:
+        result_states = set()
+        pre_image = self.prepare_pre_image(current_states)
+        actions = self.get_agents_actions(agent_ids)
+
+        for state_id in pre_image:
+            for action in itertools.product(*actions):
+
+                if self.is_reachable_by_agents(agent_ids, state_id, list(action), is_winning_state):
+                    self.strategy[state_id] = list(action)
+                    result_states.add(state_id)
+                    is_winning_state[state_id] = True
+                    break
+
+        return result_states
+
     def basic_formula_many_agents(self, agent_ids: List[int], current_states: Set[int],
                                   is_winning_state: List[bool]) -> Set[int]:
         result_states = set()
         pre_image = self.prepare_pre_image(current_states)
         actions = self.get_agents_actions(agent_ids)
 
-        # print(actions)
-        # print("Pre image:", pre_image)
         for state_id in pre_image:
             if is_winning_state[state_id]:
                 result_states.add(state_id)
                 continue
 
-            # print("Hello")
             for action in itertools.product(*actions):
 
                 if self.is_reachable_by_agents(agent_ids, state_id, list(action), is_winning_state):
@@ -904,6 +918,26 @@ class ATLirModel(ATLIrModel):
 
         self.strategy = current_strategy.copy()
         return False
+
+    def basic_max_formula_many_agents(self, agents_ids: List[int], current_states: Set[int],
+                                  is_winning_state: List[bool]) -> Set[int]:
+        result_states = set()
+        actions = self.get_agents_actions(agents_ids)
+
+        for state_id in current_states:
+            for pre_state in self.pre_states[state_id]:
+
+                for action in itertools.product(*actions):
+                    res, new_epi = self.is_reachable_by_agents(agents_ids, pre_state, action, is_winning_state)
+                    if res:
+                        epistemic_class = new_epi  # self.epistemic_class_for_state_multiple_agents(pre_state, agents_ids)
+                        result_states.update(epistemic_class)
+                        for epistemic_state_id in epistemic_class:
+                            is_winning_state[epistemic_state_id] = True
+                            self.strategy[epistemic_state_id] = list(action)
+                        break
+
+        return result_states
 
     def basic_formula_many_agents(self, agents_ids: List[int], current_states: Set[int],
                                   is_winning_state: List[bool]) -> Set[int]:
