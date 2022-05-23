@@ -44,6 +44,7 @@ class SimpleExpressionOperator(Enum):
     NOT = "!"
     EQ = "="
     NEQ = "!="
+    GT = ">"
 
 
 class SimpleExpression:
@@ -79,6 +80,8 @@ class SimpleExpression:
             return str(left) == str(right)
         elif self.operator == SimpleExpressionOperator.NEQ:
             return str(left) != str(right)
+        elif self.operator == SimpleExpressionOperator.GT:
+            return int(left) > int(right)
         else:
             raise Exception("Can't evaluate a SimpleExpression: unknown operator")
 
@@ -153,7 +156,7 @@ class FormulaParser(Parser):
         self.consume("(")
         formulaExpression = []
         while True:
-            res = self.readUntil([")", "(", "&", "|", "=", "!"])
+            res = self.readUntil([")", "(", "&", "|", "=", "!", ">"])
             str = res[0]
             chr = res[1]
             if chr == ")":
@@ -162,7 +165,7 @@ class FormulaParser(Parser):
                 break
             elif chr == "(":
                 formulaExpression.append(self.__parseFormulaExpression())
-            elif chr == "&" or chr == "|" or chr == "=" or chr == "!":
+            elif chr == "&" or chr == "|" or chr == "=" or chr == "!" or chr == ">":
                 if len(str) > 0:
                     formulaExpression.append(str)
                 if chr == "!" and self.peekChar(1) == "=":
@@ -204,13 +207,15 @@ class FormulaParser(Parser):
             return self.__convertToSimpleExpressionByOperator(arr, SimpleExpressionOperator.AND)
 
         # EQ/NEQ
-        if len(arr) == 3 and (arr[1] == "=" or arr[1] == "!="):
+        if len(arr) == 3 and (arr[1] == "=" or arr[1] == "!=" or arr[1] == ">"):
             left = self.__convertToSimpleExpression(arr[0])
             right = self.__convertToSimpleExpression(arr[2])
             if arr[1] == "=":
                 return SimpleExpression(left, SimpleExpressionOperator.EQ, right)
             elif arr[1] == "!=":
                 return SimpleExpression(left, SimpleExpressionOperator.NEQ, right)
+            elif arr[1] == ">":
+                return SimpleExpression(left, SimpleExpressionOperator.GT, right)
 
         return arr
 
