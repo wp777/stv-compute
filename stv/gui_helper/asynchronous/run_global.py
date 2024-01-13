@@ -3,6 +3,7 @@ import json
 from stv.models.asynchronous.parser import GlobalModelParser
 import base64
 import subprocess
+import os
 
 mode = sys.argv[3]  # "global" | "reduced"
 modelStr = sys.argv[4]
@@ -17,32 +18,61 @@ if mode != "reduced":
     subprocess.call("../stv_v2/build/stv.exe -f stv_model_file.txt -m 3 --OUTPUT_DOT_FILES", stdout=out_file, stderr=out_file, shell=False)
     out_file.close()
 
-    localModels = [json.dumps({"nodes": [{"T": {"j": "j"}, "id": 0, "bgn": 0, "win": 0, "str": 0}], "links": [{"id": 0, "source": 0, "target": 0, "T": "", "str": 0}]})]
-    localModelNames = ["Hello"]
+    localModels = []
+    localModelNames = []
     global_model = {"nodes": [], "links": []}
     formula = "text"
 
     with open("dot/stv_model_file-GlobalModel.dot") as file:
         data = file.read().split("\n")[14:-1]
+        states_ids = {}
+        current_transition_id = 0
+        current_id = 0
         for line in data:
             if line.find('"->"') == -1:
                 elements = line.split('"')
                 node_id = elements[1]
                 node_label = elements[3]
-                global_model["nodes"].append({"T": node_label, "id": node_id, "bgn": 0})
+                bgn = 1 if current_id == 0 else 0
+                global_model["nodes"].append({"T": {"id": node_id}, "id": current_id, "bgn": bgn})
+                states_ids[node_id] = current_id
+                current_id += 1
             else:
                 elements = line.split('"')
-                transition_id = elements[5]
+                transition_id = current_transition_id
                 actions = elements[5]
                 state_id = elements[1]
                 target_id = elements[3]
-                global_model["links"].append({"id": transition_id, "source": state_id, "target": target_id, "T": actions,
+                global_model["links"].append({"id": transition_id, "source": states_ids[state_id], "target": states_ids[target_id], "T": [actions],
                      "str": 0})
+                current_transition_id += 1
     
-    # global_model = {"nodes": [{"T": {"j": "j"}, "id": 0, "bgn": 0, "win": 0, "str": 0}], "links": [{"id": 0, "source": 0, "target": 0, "T": "", "str": 0}]}
-    # global_model = {}
-    localModels = [json.dumps(global_model)]
-    # localModelNames = {}
+    for filename in os.listdir("dot"):
+        f = os.path.join("dot", filename)
+        if os.path.isfile(f) and "LocalModel" in filename:
+            agent_name = filename.split("-")[1].split("_")[1].split(".")[0]
+            localModelNames.append(agent_name)
+            with open(f, "r") as file:
+                data = file.read().split("\n")[14:-1]
+                current_transition_id = 0
+                local_model = {"nodes": [], "links": []}
+                for line in data:
+                    line = line.strip()
+                    if line.find('->') == -1:
+                        elements = line.split('"')
+                        node_id = int(elements[0].split("[")[0])
+                        node_label = elements[1]
+                        bgn = 1 if node_id == 0 else 0
+                        local_model["nodes"].append({"T": {"id": node_id}, "id": node_id, "bgn": bgn})
+                    else:
+                        elements = line.split('"')
+                        transition_id = current_transition_id
+                        actions = elements[1]
+                        state_id, target_id = map(int, elements[0].split("[")[0].split("->"))
+                        local_model["links"].append({"id": transition_id, "source": state_id, "target": target_id, "T": [actions],
+                            "str": 0})
+                        current_transition_id += 1
+                localModels.append(json.dumps(local_model))
     
     with open("stv_debug.txt", "w") as file:
         print(json.dumps({
