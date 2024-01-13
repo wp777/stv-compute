@@ -73,6 +73,8 @@ if mode != "reduced":
                             "str": 0})
                         current_transition_id += 1
                 localModels.append(json.dumps(local_model))
+        if ".dot" in filename:
+            os.remove(f)
     
     with open("stv_debug.txt", "w") as file:
         print(json.dumps({
@@ -90,14 +92,6 @@ if mode != "reduced":
         "reducedModel": None,
         "formula": formula
     }))
-
-    # print(json.dumps({
-    #     # "localModels": localModels,
-    #     # "localModelNames": localModelNames,
-    #     "globalModel": json.dumps({"nodes": [], "links": []}),
-    #     # "reducedModel": None,
-    #     # "formula": formula
-    # }))
     
     exit()
 
