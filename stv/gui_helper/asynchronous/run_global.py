@@ -4,6 +4,7 @@ from stv.models.asynchronous.parser import GlobalModelParser
 import base64
 import subprocess
 import os
+import re
 
 mode = sys.argv[3]  # "global" | "reduced"
 modelStr = sys.argv[4]
@@ -13,6 +14,7 @@ if mode != "reduced":
         dstr = base64.b64decode(modelStr).decode("UTF-8")
         dstr = dstr.replace("\r", "")
         print(dstr, file=file)
+        formula = re.findall("^FORMULA: .*", dstr, re.MULTILINE)[0].lstrip("FORMULA:")
 
     out_file = open("stv_output.txt", "w")
     subprocess.call("../stv_v2/build/stv.exe -f stv_model_file.txt -m 3 --OUTPUT_DOT_FILES", stdout=out_file, stderr=out_file, shell=False)
@@ -21,7 +23,7 @@ if mode != "reduced":
     localModels = []
     localModelNames = []
     global_model = {"nodes": [], "links": []}
-    formula = "text"
+    # formula = "text"
 
     with open("dot/stv_model_file-GlobalModel.dot") as file:
         data = file.read().split("\n")[14:-1]
