@@ -19,7 +19,7 @@ if mode == "global":
         formula = re.findall("^FORMULA: .*", dstr, re.MULTILINE)[0].lstrip("FORMULA:")
 
     out_file = open("stv_output.txt", "w")
-    subprocess.call("../stv_v2/build/stv.exe -f stv_model_file.txt -m 3 --OUTPUT_DOT_FILES", stdout=out_file, stderr=out_file, shell=False)
+    subprocess.call("../stv_v2/build/stv -f stv_model_file.txt -m 3 --OUTPUT_DOT_FILES", stdout=out_file, stderr=out_file, shell=True)
     out_file.close()
 
     global_model = {"nodes": [], "links": []}

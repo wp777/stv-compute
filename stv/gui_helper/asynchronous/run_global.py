@@ -17,7 +17,8 @@ if mode != "reduced":
         formula = re.findall("^FORMULA: .*", dstr, re.MULTILINE)[0].lstrip("FORMULA:")
 
     out_file = open("stv_output.txt", "w")
-    subprocess.call("../stv_v2/build/stv.exe -f stv_model_file.txt -m 3 --OUTPUT_DOT_FILES", stdout=out_file, stderr=out_file, shell=False)
+    #subprocess.call("pwd", stdout=out_file, stderr=out_file, shell=False)
+    subprocess.call("../stv_v2/build/stv -f stv_model_file.txt -m 3 --OUTPUT_DOT_FILES", stdout=out_file, stderr=out_file, shell=True)
     out_file.close()
 
     localModels = []
@@ -34,9 +35,15 @@ if mode != "reduced":
             if line.find('"->"') == -1:
                 elements = line.split('"')
                 node_id = elements[1]
-                node_label = elements[3]
+                label_dict = {"id": node_id}
+                node_label = elements[3][1:-1]
+                for label in node_label.split("{"):
+                    label = label.rstrip("|").rstrip("}")
+                    for param in label.split("\\n")[1:]:
+                        p_name, p_val = param.split("=")
+                        label_dict[p_name] = p_val
                 bgn = 1 if current_id == 0 else 0
-                global_model["nodes"].append({"T": {"id": node_id}, "id": current_id, "bgn": bgn})
+                global_model["nodes"].append({"T": label_dict, "id": current_id, "bgn": bgn})
                 states_ids[node_id] = current_id
                 current_id += 1
             else:
@@ -64,8 +71,13 @@ if mode != "reduced":
                         elements = line.split('"')
                         node_id = int(elements[0].split("[")[0])
                         node_label = elements[1]
+                        label_dict = {"id": node_id}
+                        node_label = elements[1][1:-1].split("|")[-1]
+                        for param in node_label.split("\\n"):
+                            p_name, p_val = param.split("=")
+                            label_dict[p_name] = p_val
                         bgn = 1 if node_id == 0 else 0
-                        local_model["nodes"].append({"T": {"id": node_id}, "id": node_id, "bgn": bgn})
+                        local_model["nodes"].append({"T": label_dict, "id": node_id, "bgn": bgn})
                     else:
                         elements = line.split('"')
                         transition_id = current_transition_id
