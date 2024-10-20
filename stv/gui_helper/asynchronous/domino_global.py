@@ -83,7 +83,9 @@ if mode == "global":
                 strat = 0
                 for counter_ex in counter_example_links:
                     if counter_ex in line:
-                        strat = 0
+                        strat = 1
+                if elements[7] == "red":
+                    strat = 1
                 global_model["links"].append({"id": transition_id, "source": states_ids[state_id], "target": states_ids[target_id], "T": [actions],
                      "str": strat})
                 current_transition_id += 1
@@ -95,7 +97,7 @@ if mode == "global":
 
     with open("stv_output.txt", "r") as file:
         output = file.read().split("\n")
-        if "OK" in output[0]:
+        if "TRUE" in output[0]:
             print("1")
         else:
             print("0")
