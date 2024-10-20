@@ -84,7 +84,7 @@ if mode == "global":
                 for counter_ex in counter_example_links:
                     if counter_ex in line:
                         strat = 1
-                if elements[7] == "red":
+                if len(elements) >= 8 and elements[7] == "red":
                     strat = 1
                 global_model["links"].append({"id": transition_id, "source": states_ids[state_id], "target": states_ids[target_id], "T": [actions],
                      "str": strat})
