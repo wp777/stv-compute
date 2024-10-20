@@ -37,6 +37,15 @@ bis_result = global_model1.model.check_bisimulation(global_model2.model, mapping
 # for i in range(3, 7):
 #     correspondingNodeIds.append([i, n - i - 1])
 
+with open("bis_debug.txt", "w") as file:
+        print(json.dumps({
+    "model1": global_model1.model.js_dump_model(winning),
+    "model2": global_model2.model.js_dump_model(winning),
+    "mapping": mapping,
+    "bisimulation_result": bis_result,
+    "coalition": global_model1.coalition_ids_to_str(coalition),
+}), file=file)
+
 print(json.dumps({
     "model1": global_model1.model.js_dump_model(winning),
     "model2": global_model2.model.js_dump_model(winning),
