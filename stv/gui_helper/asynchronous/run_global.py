@@ -18,7 +18,7 @@ if mode != "reduced" and base64.b64decode(modelStr).decode("UTF-8")[0] != "%":
 
     out_file = open("stv_output.txt", "w")
     #subprocess.call("pwd", stdout=out_file, stderr=out_file, shell=False)
-    subprocess.call("../stv_v2/build/stv -f stv_model_file.txt -m 3 --OUTPUT_DOT_FILES", stdout=out_file, stderr=out_file, shell=True)
+    subprocess.call("../stv_v2/build/stv -f stv_model_file.txt -m 1 --OUTPUT_DOT_FILES", stdout=out_file, stderr=out_file, shell=True)
     out_file.close()
 
     localModels = []
