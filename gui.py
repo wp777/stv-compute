@@ -47,6 +47,8 @@ if __name__ == "__main__":
             import stv.gui_helper.asynchronous.domino_global
         elif method == 'on_the_fly':
             import stv.gui_helper.asynchronous.on_the_fly_global
+        elif method == 'natural':
+            import stv.gui_helper.asynchronous.natural
     elif model == 'bisimulation':
         if method == 'run':
             import stv.gui_helper.asynchronous.run_bisimulation
