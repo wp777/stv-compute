@@ -99,7 +99,7 @@ with open("stv_output.txt", "r") as file:
     if "TRUE" in output[0]:
         print("1")
         natural_strategy = output[1:-3]
-        complexity = output[-2]
+        complexity = output[-2].split(":")[1].strip()
     else:
         print("0")
 
