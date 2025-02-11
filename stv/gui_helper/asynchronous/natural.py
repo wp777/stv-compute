@@ -93,13 +93,16 @@ for filename in os.listdir("dot"):
         os.remove(f)
 
 natural_strategy = ""
+complexity = ""
 with open("stv_output.txt", "r") as file:
     output = file.read().split("\n")
     if "TRUE" in output[0]:
         print("1")
         natural_strategy = output[1:-3]
+        complexity = output[-1].split(":")[-1].strip()
     else:
         print("0")
 
 print(json.dumps(global_model))
 print(natural_strategy)
+print(complexity)
