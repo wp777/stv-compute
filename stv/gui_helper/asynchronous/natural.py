@@ -97,7 +97,7 @@ with open("stv_output.txt", "r") as file:
     output = file.read().split("\n")
     if "TRUE" in output[0]:
         print("1")
-        natural_strategy = output[1:-2]
+        natural_strategy = output[1:-3]
     else:
         print("0")
 
